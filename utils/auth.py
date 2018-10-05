@@ -3,6 +3,7 @@
 import hashlib
 import time
 
+from utils.convert import to_int
 from web.model import User
 from config import configs
 
@@ -41,7 +42,7 @@ async def parse_token(token):
     if len(lst) != 3:
         return None
     uid, expires, sha = lst
-    if int(expires) < time.time():
+    if to_int(expires, default=0) < time.time():
         return None
     user = await User.find(uid)
     if user is None:
