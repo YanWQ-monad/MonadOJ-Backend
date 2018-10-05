@@ -189,6 +189,10 @@ class ModelMetaclass(type):
         attrs['__fields__'] = fields
         attrs['__model_name__'] = name
 
+        escaped = [f'`{f}`' for f in fields]
+        dot_holder = ', '.join(['?'] * len(escaped))
+        escaped_holder = ', '.join(escaped)
+        set_holder = ', '.join([f'`{mapping.get(f).name or f}`=?' for f in fields])
         attrs['__sql__'] = dict()
         attrs['__sql__']['select'] = f'SELECT `{primary}`, {escaped_holder} FROM {table}'
         attrs['__sql__']['insert'] = f'INSERT INTO `{table}` ({escaped_holder}) VALUES ({dot_holder})'
