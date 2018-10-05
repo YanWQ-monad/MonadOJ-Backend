@@ -56,6 +56,9 @@ configs = {
     'session': {
         'max_age': 90000,
         'secret': 'tGK7`iXm(ZtqI;B6}=ndH1KrQ.NCZ3r[9.A9J)G^DwlSq",@IvDeNW-Q;>,ayt'
+    },
+    'secret': {
+        'password_salt': 'g4g4*I^7uj/4t3]4tg4@u867'
     }
 }
 
