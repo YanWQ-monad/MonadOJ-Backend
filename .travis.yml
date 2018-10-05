@@ -32,3 +32,6 @@ after_success:
   - coveralls
   - coverage xml
   - python-codacy-coverage -r coverage.xml
+
+after_failure:
+  - cat test.log
