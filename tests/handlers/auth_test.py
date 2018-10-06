@@ -45,6 +45,9 @@ class TestAuth(TestCase):
 
         self.assertEqual(len(user), 1)
         user = user[0]
+
+        tk = await self.check_token(resp['token'])
+        self.assertEqual(tk['uid'], resp['uid'])
         self.assertIsNone(resp['error'])
         self.assertEqual(user.email, 'test_root@test.com')
         self.assertEqual(user.uid, resp['uid'])

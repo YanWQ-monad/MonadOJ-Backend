@@ -49,5 +49,6 @@ async def user_register(*, username, email, password):
     user = User(name=username, email=email, password=sha.hexdigest(), admin=False, image=gravatar)
     await user.save()
 
+    user.token = auth.gen_token(user)
     user.password = '********'
     return user
