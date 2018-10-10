@@ -9,5 +9,12 @@ def to_int(s, *, err=APIBadRequest, default=None):
     except ValueError:
         if default is not None:
             return default
-        raise err('params must be an integer')
+        raise err('one of the params must be an integer')
     return num
+
+
+def extend_dict(*args):
+    result = dict()
+    for arg in args:
+        result.update(arg)
+    return result
