@@ -23,3 +23,9 @@ class TestApis(TestCase):
         self.assertEqual(p.page_count, 10)
         self.assertEqual(p.offset, 90)
         self.assertEqual(p.limit, 10)
+
+    def test_page_4(self):
+        p = Page(30, 3, 20)
+        self.assertEqual(p.page_count, 2)
+        self.assertEqual(p.offset, 0)
+        self.assertEqual(p.limit, 0)
