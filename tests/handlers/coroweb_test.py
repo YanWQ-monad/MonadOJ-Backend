@@ -6,12 +6,14 @@ from tests.util import async_test, MonadSession
 
 
 class TestCoroutineWeb(TestCase):
+    @classmethod
     @async_test
-    async def setUp(self):
+    async def setUpClass(self):
         self.client = MonadSession()
 
+    @classmethod
     @async_test
-    async def tearDown(self):
+    async def tearDownClass(self):
         await self.client.close()
         self.client = None
 
