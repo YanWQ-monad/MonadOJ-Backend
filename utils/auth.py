@@ -3,6 +3,7 @@
 import hashlib
 import time
 
+from utils.apis import APIPermissionError
 from utils.convert import to_int
 from web.model import User
 from config import configs
@@ -52,4 +53,25 @@ async def parse_token(token):
         return None
 
     user.password = '********'
+    return user
+
+
+async def check_admin(token):
+    """Parse the token and check whether the user is administrator
+
+    If the user of the token has not administrator permission,
+    apis.APIPermissionError will be raised
+
+    Args:
+        token: (str) The token
+
+    Raises:
+        apis.APIPermissionError if the user is not administrator
+
+    Returns:
+        User: the user of the token
+    """
+    user = await parse_token(token)
+    if user is None or user.admin is False:
+        raise APIPermissionError()
     return user
