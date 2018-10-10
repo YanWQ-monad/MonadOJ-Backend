@@ -59,6 +59,9 @@ configs = {
     },
     'secret': {
         'password_salt': 'g4g4*I^7uj/4t3]4tg4@u867'
+    },
+    'judge': {
+        'testcases_path': '../data/testcases'
     }
 }
 
