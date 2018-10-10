@@ -2,6 +2,7 @@
 
 import unittest
 
+from .handlers.admin_problem_test import TestAdminProblem
 from .handlers.coroweb_test import TestCoroutineWeb
 from .utils.convert_test import TestConvert
 from .handlers.auth_test import TestAuth
@@ -18,5 +19,6 @@ def get_test_suite():
     add_test_class(TestConvert)
     add_test_class(TestApis)
     add_test_class(TestAuth)
+    add_test_class(TestAdminProblem)
 
     return suite

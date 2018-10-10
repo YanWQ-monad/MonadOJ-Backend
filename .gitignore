@@ -9,3 +9,4 @@ htmlcov/
 .coverage.*
 nosetests.xml
 test.log
+test_temp

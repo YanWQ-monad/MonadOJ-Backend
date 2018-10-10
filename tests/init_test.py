@@ -4,6 +4,8 @@ import web.coroweb as coroweb
 from aiohttp import web
 import web.orm as orm
 import config
+import shutil
+import os
 
 patched_config = {
     'debug': False,
@@ -24,6 +26,9 @@ patched_config = {
     },
     'secret': {
         'password_salt': 'PASSWORD SALT'
+    },
+    'judge': {
+        'testcases_path': 'test_temp/testcases'
     }
 }
 
@@ -46,6 +51,27 @@ async def init_database_content():
         
             UNIQUE KEY `name` (`name`),
             UNIQUE KEY `email` (`email`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1000;
+    ''')
+
+    await orm.execute('DROP TABLE IF EXISTS `problems`')
+    await orm.execute('''
+        CREATE TABLE problems (
+            `pid` INT AUTO_INCREMENT PRIMARY KEY,
+            `name` VARCHAR(64) NOT NULL,
+            `description` TEXT NOT NULL,
+            `input_format` TEXT NOT NULL,
+            `output_format` TEXT NOT NULL,
+            `samples` TEXT NOT NULL,
+            `hint` TEXT NOT NULL,
+            `testcases` TEXT NOT NULL,
+            `provider` VARCHAR(64) NOT NULL,
+            `tags` VARCHAR(256) NOT NULL,
+            `visible` BOOLEAN NOT NULL,
+        
+            KEY `name` (`name`),
+            KEY `visible` (`visible`),
+            KEY `tags` (`tags`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1000;
     ''')
 
@@ -77,8 +103,17 @@ def patch_config():
     config.configs = config.to_dict(patched_config)
 
 
+def make_test_dir():
+    if os.path.exists('test_temp'):
+        shutil.rmtree('test_temp')
+    os.mkdir('test_temp')
+    os.mkdir('test_temp/testcases')
+
+
 async def init_test(loop):
     """Initialize test environment
     """
-    patch_config()
+    make_test_dir()
     await init(loop)
+
+patch_config()
