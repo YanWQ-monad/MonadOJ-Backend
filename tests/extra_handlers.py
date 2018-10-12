@@ -59,20 +59,16 @@ async def ws_test(*, request):
     ws = aiohttp.web.WebSocketResponse()
     await ws.prepare(request)
 
-    try:
-        async for msg in ws:
-            if msg.type == aiohttp.WSMsgType.TEXT:
-                data = json.loads(msg.data)
-                if data['type'] == 'close':
-                    await ws.close()
-                elif data['type'] == 'msg':
-                    await ws.send_json(dict(msg=data['msg']))
-                else:
-                    await ws.send_json(dict(error=f'Invalid message type: {data["type"]}'))
-            elif msg.type == aiohttp.WSMsgType.ERROR:
-                logging.warning(f'Websocket connection closed with exception:\n{ws.exception()}')
-    except:
-        import traceback
-        traceback.print_exc()
+    async for msg in ws:
+        if msg.type == aiohttp.WSMsgType.TEXT:
+            data = json.loads(msg.data)
+            if data['type'] == 'close':
+                await ws.close()
+            elif data['type'] == 'msg':
+                await ws.send_json(dict(msg=data['msg']))
+            else:
+                await ws.send_json(dict(error=f'Invalid message type: {data["type"]}'))
+        elif msg.type == aiohttp.WSMsgType.ERROR:
+            logging.warning(f'Websocket connection closed with exception:\n{ws.exception()}')
 
     return ws

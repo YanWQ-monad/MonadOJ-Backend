@@ -2,6 +2,7 @@
 
 from urllib import parse
 from aiohttp import web
+import traceback
 import asyncio
 import inspect
 import logging
@@ -130,6 +131,7 @@ class HandleRequest:
         except APIError as e:
             return web.json_response(dict(error=e.error, msg=e.msg), status=400)
         except Exception:
+            logging.error(traceback.format_exc())
             return web.json_response(dict(error='server:server_internal_error'), status=500)
         return resp
 

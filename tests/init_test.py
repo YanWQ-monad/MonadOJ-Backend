@@ -21,6 +21,9 @@ patched_config = {
     'session': {
         'max_age': 90000,
         'secret': 'SECRET KEY'
+    },
+    'secret': {
+        'password_salt': 'PASSWORD SALT'
     }
 }
 
@@ -30,7 +33,21 @@ runner = None
 async def init_database_content():
     """Initialize MySql database data (create empty tables)
     """
-    pass
+    await orm.execute('DROP TABLE IF EXISTS `users`')
+    await orm.execute('''
+        CREATE TABLE users (
+            `uid` INT AUTO_INCREMENT PRIMARY KEY,
+            `name` VARCHAR(64) NOT NULL,
+            `email` VARCHAR(64) NOT NULL,
+            `password` CHAR(128) NOT NULL,
+            `image` VARCHAR(256) NOT NULL,
+            `created_at` BIGINT NOT NULL,
+            `admin` INT NOT NULL,
+        
+            UNIQUE KEY `name` (`name`),
+            UNIQUE KEY `email` (`email`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1000;
+    ''')
 
 
 async def init(loop):

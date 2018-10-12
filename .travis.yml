@@ -19,7 +19,7 @@ python:
 
 install:
   - pip install -r requirements.txt
-  - pip install coverage coveralls
+  - pip install coverage coveralls codacy-coverage
 
 before_script:
   - ./tests/create_database.sh
@@ -30,3 +30,8 @@ script:
 
 after_success:
   - coveralls
+  - coverage xml
+  - python-codacy-coverage -r coverage.xml
+
+after_failure:
+  - cat test.log
