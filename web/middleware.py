@@ -1,8 +1,29 @@
 # -*- coding: utf-8 -*-
 
+from utils.auth import parse_token
 from aiohttp import web
 import logging
 import json
+
+
+@web.middleware
+async def auth(request, handler):
+    """Parse `User-Token` in headers
+    Parse the token and store User Model to `request.user`
+
+    Args:
+        request: (aiohttp.web.Request) Request instance
+        handler: (function) The handler function
+
+    Returns:
+        any: Forward the return value from handler()
+    """
+    token = request.headers.get('Authorization', '')
+    user = await parse_token(token)
+    request.user = user
+
+    resp = await handler(request)
+    return resp
 
 
 @web.middleware
@@ -67,4 +88,4 @@ async def response(request, handler):
     return resp
 
 
-middlewares = [response]
+middlewares = [auth, response]

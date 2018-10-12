@@ -26,8 +26,8 @@ async def user_login(*, username, password):
 
 
 @get('/api/auth/check_token')
-async def check_token(*, token):
-    user = await auth.parse_token(token)
+async def check_token(*, request):
+    user = request.user
     if user is None:
         return dict(error='auth:invalid_token', msg='Invalid Token')
     user.password = '********'
