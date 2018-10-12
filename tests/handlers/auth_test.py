@@ -12,14 +12,14 @@ import config
 class TestAuth(TestCase):
     @classmethod
     @async_test
-    async def setUpClass(self):
-        self.client = MonadSession()
+    async def setUpClass(cls):
+        cls.client = MonadSession()
 
     @classmethod
     @async_test
-    async def tearDownClass(self):
-        await self.client.close()
-        self.client = None
+    async def tearDownClass(cls):
+        await cls.client.close()
+        cls.client = None
 
     async def get_token(self, username, password):
         payload = {

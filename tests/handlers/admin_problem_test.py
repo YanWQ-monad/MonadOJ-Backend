@@ -60,9 +60,9 @@ class TestAdminProblem(TestCase):
 
     @classmethod
     @async_test
-    async def tearDownClass(self):
-        await self.client.close()
-        self.client = None
+    async def tearDownClass(cls):
+        await cls.client.close()
+        cls.client = None
 
     @async_test
     async def test_1_create_problem(self):
