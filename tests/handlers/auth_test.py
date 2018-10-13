@@ -10,12 +10,14 @@ import config
 
 
 class TestAuth(TestCase):
+    @classmethod
     @async_test
-    async def setUp(self):
+    async def setUpClass(self):
         self.client = MonadSession()
 
+    @classmethod
     @async_test
-    async def tearDown(self):
+    async def tearDownClass(self):
         await self.client.close()
         self.client = None
 
@@ -40,19 +42,18 @@ class TestAuth(TestCase):
             'password': 'TEST ROOT ONLY'
         }
         async with self.client.request('POST', '/api/auth/register', data=payload) as resp:
-            resp = await resp.json()
+            msg = await resp.json()
         user = await User.find_all('name=?', args=['TestRoot'])
 
         self.assertEqual(len(user), 1)
         user = user[0]
-
-        tk = await self.check_token(resp['token'])
-        self.assertEqual(tk['uid'], resp['uid'])
-        self.assertIsNone(resp['error'])
+        tk = await self.check_token(msg['token'])
+        self.assertEqual(tk['uid'], msg['uid'])
+        self.assertIsNone(msg['error'])
         self.assertEqual(user.email, 'test_root@test.com')
-        self.assertEqual(user.uid, resp['uid'])
+        self.assertEqual(user.uid, msg['uid'])
         self.assertFalse(user.admin)
-        self.assertNotEqual(resp['password'].find('*'), -1)
+        self.assertNotEqual(msg['password'].find('*'), -1)
 
         # set user to be admin and create a common user in order to complete the test after this
         user.admin = True

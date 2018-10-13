@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO,
 import asyncio
 import unittest
 
-from tests import *
+from tests import get_test_suite
 from tests import init_test
 import handlers
 from tests import extra_handlers
@@ -25,6 +25,8 @@ if __name__ == '__main__':
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(init_test.init_test(loop))
-        unittest.main(verbosity=2)
+        suite = get_test_suite()
+        runner = unittest.TextTestRunner(verbosity=2)
+        runner.run(suite)
     finally:
         loop.run_until_complete(init_test.close_test())

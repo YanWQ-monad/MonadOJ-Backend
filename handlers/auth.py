@@ -13,7 +13,7 @@ import utils.apis as apis
 async def user_login(*, username, password):
     user = await User.find_all('name=?', [username], size=1)
     if len(user) == 0:
-        return dict(error='auth:user_not_find', msg='No such user')
+        return dict(error='auth:user_not_find', msg='Username : No such user')
     user = user[0]
 
     sha = hashlib.sha512()
