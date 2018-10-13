@@ -9,16 +9,15 @@ import os
 from utils.convert import to_int, dict_array, array_dict
 from web.model import Problem, ProblemList
 from constant import TESTCASE_DICT_KEYS
-from utils.auth import check_admin
+from utils.auth import admin_required
 from web.coroweb import get, post
 from config import configs
 import utils.apis as apis
 
 
 @post('/api/admin/problem/add')
-async def admin_add_problem(*, token, name, description, input_format, output_format, samples, hint):
-    user = await check_admin(token)
-
+@admin_required
+async def admin_add_problem(*, request, name, description, input_format, output_format, samples, hint):
     problem = Problem(
         name=name,
         description=description,
@@ -27,7 +26,7 @@ async def admin_add_problem(*, token, name, description, input_format, output_fo
         samples=samples,
         hint=hint,
         testcases=json.dumps(dict(spj=None, testcases=[])),
-        provider=user.name
+        provider=request.user.name
     )
 
     await problem.save()
@@ -36,9 +35,8 @@ async def admin_add_problem(*, token, name, description, input_format, output_fo
 
 
 @post('/api/admin/problem/edit')
-async def admin_edit_problem(*, token, pid, name, description, input_format, output_format, samples, hint, testcases, spj=False):
-    await check_admin(token)
-
+@admin_required
+async def admin_edit_problem(*, pid, name, description, input_format, output_format, samples, hint, testcases, spj=False):
     problem = await Problem.find(pid)
     if problem is None:
         raise apis.APIBadRequest('No such problem')
@@ -60,9 +58,8 @@ async def admin_edit_problem(*, token, pid, name, description, input_format, out
 
 
 @get('/api/admin/problem/get')
-async def admin_get_problem(*, token, pid):
-    await check_admin(token)
-
+@admin_required
+async def admin_get_problem(*, pid):
     problem = await Problem.find(pid)
     if problem is None:
         raise apis.APIBadRequest('No such problem')
@@ -76,7 +73,8 @@ async def admin_get_problem(*, token, pid):
 
 
 @post('/api/admin/problem/upload_testcases')
-async def admin_upload_testcases(*, token, pid, zip_bin, spj=False):
+@admin_required
+async def admin_upload_testcases(*, pid, zip_bin, spj=False):
     def namelist_filter(lst, with_spj):
         prefixes = [name[:-3] for name in lst if name.endswith('.in') and '/' not in name]
         testcases = [dict(index=i, name=name, out=(f'{name}.out' in lst)) for (i, name) in enumerate(prefixes)]
@@ -88,8 +86,6 @@ async def admin_upload_testcases(*, token, pid, zip_bin, spj=False):
         async with aiofiles.open(path, 'wb') as f:
             await f.write(data.replace(b'\r\n', b'\n').replace(b'\r', b'\n'))
         os.chmod(path, 0o640)
-
-    await check_admin(token)
 
     problem = await Problem.find(pid)
     if problem is None:
@@ -130,9 +126,8 @@ async def admin_upload_testcases(*, token, pid, zip_bin, spj=False):
 
 
 @get('/api/admin/problem/list')
-async def admin_list_problem(*, token, index):
-    await check_admin(token)
-
+@admin_required
+async def admin_list_problem(*, index):
     index = to_int(index)
 
     num = await ProblemList.count_item('pid')

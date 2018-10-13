@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import functools
 import hashlib
 import time
 
-from utils.apis import APIPermissionError
+from utils.apis import APIPermissionError, APINeedLogin
 from utils.convert import to_int
 from web.model import User
 from config import configs
@@ -57,21 +58,50 @@ async def parse_token(token):
 
 
 async def check_admin(token):
-    """Parse the token and check whether the user is administrator
-
-    If the user of the token has not administrator permission,
-    apis.APIPermissionError will be raised
-
-    Args:
-        token: (str) The token
-
-    Raises:
-        apis.APIPermissionError if the user is not administrator
-
-    Returns:
-        User: the user of the token
-    """
     user = await parse_token(token)
     if user is None or user.admin is False:
         raise APIPermissionError()
     return user
+
+
+def admin_required(func):
+    """Handler decorator for filtering non-administrator
+
+    If the user of the token (from headers) has not administrator permission,
+    apis.APIPermissionError will be raised
+
+    Raises:
+        apis.APIPermissionError if the user is not administrator
+    """
+    @functools.wraps(func)
+    async def wrapper(wrapper_request, *args, **kwargs):
+        user = wrapper_request.user
+        if user is None or not user.admin:
+            raise APIPermissionError()
+
+        return await func(*args, **kwargs)
+
+    wrapper.__require_request__ = True
+
+    return wrapper
+
+
+def login_required(func):
+    """Handler decorator for filtering non-login-request
+
+    If the user of the token (from headers) is not valid user,
+    apis.APINeedLogin will be raised
+
+    Raises:
+        apis.APINeedLogin if the user is not administrator
+    """
+    @functools.wraps(func)
+    async def wrapper(wrapper_request, *args, **kwargs):
+        if wrapper_request.user is None:
+            raise APINeedLogin()
+
+        return await func(*args, **kwargs)
+
+    wrapper.__require_request__ = True
+
+    return wrapper

@@ -42,6 +42,10 @@ class HandleRequest:
         self.required_args = func_args_filter(func,
             lambda param: param.kind == inspect.Parameter.KEYWORD_ONLY and param.default == inspect.Parameter.empty)
         self.has_var_args = len(func_args_filter(func, lambda param: param.kind == inspect.Parameter.VAR_KEYWORD)) > 0
+        try:
+            self.wrapper_request_required = func.__require_request__
+        except AttributeError:
+            self.wrapper_request_required = False
 
     @staticmethod
     async def get_request_params(request):
@@ -110,12 +114,10 @@ class HandleRequest:
             kw[k] = v
         if 'request' in self.named_args:
             kw['request'] = request
-
         # check the required args
-        if len(self.required_args):
-            for name in self.required_args:
-                if not name in kw:
-                    raise APIMissingParams(name)
+        for name in self.required_args:
+            if name not in kw:
+                raise APIMissingParams(name)
         return kw
 
     async def __call__(self, request):
@@ -127,7 +129,11 @@ class HandleRequest:
                 kw = await self.get_request_params(request)
             kw = self.filter_params(kw, request)
             logging.debug(f'call with args: {str(kw)}')
-            resp = await self.func(**kw)
+            if self.wrapper_request_required:
+                wrapper_request = request
+                resp = await self.func(wrapper_request, **kw)
+            else:
+                resp = await self.func(**kw)
         except APIError as e:
             return web.json_response(dict(error=e.error, msg=e.msg), status=400)
         except Exception:

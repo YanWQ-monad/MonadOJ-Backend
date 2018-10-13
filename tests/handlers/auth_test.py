@@ -12,14 +12,14 @@ import config
 class TestAuth(TestCase):
     @classmethod
     @async_test
-    async def setUpClass(self):
-        self.client = MonadSession()
+    async def setUpClass(cls):
+        cls.client = MonadSession()
 
     @classmethod
     @async_test
-    async def tearDownClass(self):
-        await self.client.close()
-        self.client = None
+    async def tearDownClass(cls):
+        await cls.client.close()
+        cls.client = None
 
     async def get_token(self, username, password):
         payload = {
@@ -30,8 +30,8 @@ class TestAuth(TestCase):
             return (await resp.json())['token']
 
     async def check_token(self, token):
-        params = {'token': token}
-        async with self.client.get('/api/auth/check_token', params=params) as resp:
+        headers = {'Authorization': token}
+        async with self.client.get('/api/auth/check_token', headers=headers) as resp:
             return await resp.json()
 
     @async_test
@@ -43,6 +43,7 @@ class TestAuth(TestCase):
         }
         async with self.client.request('POST', '/api/auth/register', data=payload) as resp:
             msg = await resp.json()
+
         user = await User.find_all('name=?', args=['TestRoot'])
 
         self.assertEqual(len(user), 1)
