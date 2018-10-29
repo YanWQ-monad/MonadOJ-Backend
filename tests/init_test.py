@@ -75,6 +75,31 @@ async def init_database_content():
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1000;
     ''')
 
+    await orm.execute('DROP TABLE IF EXISTS `submissions`')
+    await orm.execute('''
+        CREATE TABLE submissions (
+            `rid` INT AUTO_INCREMENT PRIMARY KEY,
+            `uid` INT NOT NULL,
+            `pid` INT NOT NULL,
+            `user_name` VARCHAR(64) NOT NULL,
+            `cid` INT NOT NULL,
+            `time` INT NOT NULL,
+            `code` TEXT NOT NULL,
+            `score` INT NOT NULL,
+            `status` INT NOT NULL,
+            `mini` VARCHAR(128) NOT NULL,
+            `result` TEXT NOT NULL,
+            `language` VARCHAR(16) NOT NULL,
+            
+            KEY `uid` (`uid`),
+            KEY `pid` (`pid`),
+            KEY `cid` (`cid`),
+            KEY `score` (`score`),
+            KEY `result` (`result`),
+            KEY `language` (`language`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1000;
+    ''')
+
 
 async def init(loop):
     """Start web service for test

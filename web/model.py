@@ -3,6 +3,7 @@
 import time
 
 from web.orm import Model, StringField, BooleanField, TextField, IntegerField
+from constant import JUDGE_STATUS
 
 
 class User(Model):
@@ -39,6 +40,36 @@ class ProblemList(Model):   # Read-only Model
     visible = BooleanField('visible')
 
 
+class Submission(Model):
+    __table__ = 'submissions'
+    rid = IntegerField('rid', primary_key=True)
+    uid = IntegerField('uid', default=2)  # 2 is default user (nobody)
+    pid = IntegerField('pid')
+    user_name = StringField('user_name', ddl='varchar(64)')
+    cid = IntegerField('cid', default=0)  # 0 does not belong to any contest
+    time = IntegerField('time', default=time.time)
+    code = TextField('code')
+    score = IntegerField('score', default=0)
+    status = IntegerField('status', default=JUDGE_STATUS.PENDING)
+    mini = StringField('mini', ddl='varchar(128)')  # to show the result of each point
+    result = TextField('result')  # JSON
+    language = StringField('language', ddl='varchar(16)')
+
+
+class SubmissionList(Model):   # Read-only Model
+    __table__ = 'submissions'
+    rid = IntegerField('rid', primary_key=True)
+    uid = IntegerField('uid')
+    pid = IntegerField('pid')
+    user_name = StringField('user_name', ddl='varchar(64)')
+    cid = IntegerField('cid')
+    time = IntegerField('time')
+    score = IntegerField('score')
+    status = IntegerField('status')
+    mini = StringField('mini', ddl='varchar(128)')  # to show the result of each point
+    language = StringField('language', ddl='varchar(16)')
+
+
 # SQL Table
 """
 CREATE TABLE users (
@@ -70,5 +101,27 @@ CREATE TABLE problems (
     KEY `name` (`name`),
     KEY `visible` (`visible`),
     KEY `tags` (`tags`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1000;
+
+CREATE TABLE submissions (
+    `rid` INT AUTO_INCREMENT PRIMARY KEY,
+    `uid` INT NOT NULL,
+    `pid` INT NOT NULL,
+    `user_name` VARCHAR(64) NOT NULL,
+    `cid` INT NOT NULL,
+    `time` INT NOT NULL,
+    `code` TEXT NOT NULL,
+    `score` INT NOT NULL,
+    `status` INT NOT NULL,
+    `mini` VARCHAR(128) NOT NULL,
+    `result` TEXT NOT NULL,
+    `language` VARCHAR(16) NOT NULL,
+    
+    KEY `uid` (`uid`),
+    KEY `pid` (`pid`),
+    KEY `cid` (`cid`),
+    KEY `score` (`score`),
+    KEY `result` (`result`),
+    KEY `language` (`language`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1000;
 """
