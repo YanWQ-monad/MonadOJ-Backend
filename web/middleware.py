@@ -12,11 +12,11 @@ async def auth(request, handler):
     Parse the token and store User Model to `request.user`
 
     Args:
-        request: (aiohttp.web.Request) Request instance
-        handler: (function) The handler function
+        request (aiohttp.web.Request): Request instance
+        handler (function): The handler function
 
     Returns:
-        any: Forward the return value from handler()
+        Any: Forward the return value from handler()
     """
     token = request.headers.get('Authorization', '')
     user = await parse_token(token)
@@ -31,8 +31,8 @@ async def response(request, handler):
     """Processing the response from the handler
 
     Args:
-        request: (aiohttp.web.Request) Request instance
-        handler: (function) The handler function
+        request (aiohttp.web.Request): Request instance
+        handler (function): The handler function
 
     Returns:
         aiohttp.web.Response: The response generate from the return value of handler

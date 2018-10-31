@@ -14,7 +14,7 @@ def gen_token(user):
     """Get token from a User Model
 
     Args:
-        user: (User) User Model
+        user (User): User Model
 
     Returns:
         str: The token of the user
@@ -32,11 +32,10 @@ async def parse_token(token):
     """Parse token to User Model
 
     Args:
-        token: (str) The token
+        token (str): The token
 
     Returns:
-        - None: If the token is invalid
-          User: The User Model of the token
+        User: The User Model of the token, None if the token is invalid
     """
     if not token:
         return None
@@ -65,13 +64,13 @@ async def check_admin(token):
 
 
 def admin_required(func):
-    """Handler decorator for filtering non-administrator
+    """Handler middleware for filtering non-administrator
 
     If the user of the token (from headers) has not administrator permission,
     apis.APIPermissionError will be raised
 
     Raises:
-        apis.APIPermissionError if the user is not administrator
+        apis.APIPermissionError: If the user is not administrator
     """
     @functools.wraps(func)
     async def wrapper(wrapper_request, *args, **kwargs):
@@ -87,13 +86,13 @@ def admin_required(func):
 
 
 def login_required(func):
-    """Handler decorator for filtering non-login-request
+    """Handler middleware for filtering non-login-request
 
     If the user of the token (from headers) is not valid user,
     apis.APINeedLogin will be raised
 
     Raises:
-        apis.APINeedLogin if the user is not administrator
+        apis.APINeedLogin: If the user is not administrator
     """
     @functools.wraps(func)
     async def wrapper(wrapper_request, *args, **kwargs):

@@ -17,8 +17,8 @@ def func_args_filter(func, _filter):
     """Filter the function args list with the given filter
 
     Args:
-        func: (function) Detect the args from the function
-        _filter: (function) Args filter
+        func (function): Detect the args from the function
+        _filter (function): Args filter
 
     Returns:
         tuple: Filtered args list
@@ -35,7 +35,7 @@ class HandleRequest:
         """Init class HandleRequest
 
         Args:
-            func: (function) Handler function
+            func (function): Handler function
         """
         self.func = func
         self.named_args = func_args_filter(func, lambda param: param.kind == inspect.Parameter.KEYWORD_ONLY)
@@ -52,7 +52,7 @@ class HandleRequest:
         """Get request params or payload from `request`
 
         Args:
-            request: (aiohttp.web.Request) Request instance
+            request (aiohttp.web.Request): Request instance
 
         Returns:
             dict: Request params or payload
@@ -92,8 +92,8 @@ class HandleRequest:
         """Filter and check the required request data for handler function
 
         Args:
-            kw: (dict) Request data
-            request: (aiohttp.web.Request) Request instance
+            kw (dict): Request data
+            request (aiohttp.web.Request): Request instance
 
         Returns:
             dict: Request data needed by the handler
@@ -146,9 +146,9 @@ def add_route(method, path, func):
     """Add a route to `app`
 
     Args:
-        method: (str) Request method
-        path: (str) Request path
-        func: (function) Request handler
+        method (str): Request method
+        path (str): Request path
+        func (function): Request handler
     """
     if not asyncio.iscoroutinefunction(func) and not inspect.isgeneratorfunction(func):
         func = asyncio.coroutine(func)
@@ -161,7 +161,7 @@ def decorator_factory(method):
     """Request method decorator factory
 
     Args:
-        method: (str) Request method
+        method (str): Request method
 
     Returns:
         function: Request method decorator

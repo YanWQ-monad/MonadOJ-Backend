@@ -29,7 +29,7 @@ def to_dict(d):
     """Convert a common dict to Dict
 
     Args:
-        d: (dict) Origin dict object
+        d (dict): Origin dict object
 
     Returns:
         Dict: New Dict object

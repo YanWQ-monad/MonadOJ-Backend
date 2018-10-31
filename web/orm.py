@@ -13,16 +13,16 @@ async def create_connection(loop, **kwargs):
     """Create MySql connect pool
 
     Args:
-        loop: (asyncio event loop) Event loop
-        host: (str -> 'localhost') The host of MySql instance
-        port: (int -> 3306) The port of MySql instance
-        user: (str) The username of the database
-        password: (str) The password of the user
-        db: (str) The database to store data
-        charset: (str -> 'utf8') The charset of the database
-        autocommit: (bool -> True) Whether enable auto commit
-        maxsize: (int -> 16) Minimum sizes of the pool
-        minsize: (int -> 1) Maximum sizes of the pool
+        loop (asyncio event loop): Event loop
+        host (str): The host of MySql instance (default 'localhost')
+        port (int): The port of MySql instance (default 3306)
+        user (str): The username of the database
+        password (str): The password of the user
+        db (str): The database to store data
+        charset (str): The charset of the database (default 'utf-8')
+        autocommit (bool): Whether enable auto commit (default True)
+        maxsize (int): Minimum sizes of the pool (default 16)
+        minsize (int): Maximum sizes of the pool (default 1)
     """
     logging.info('Creating database connection pool...')
     global __pool
@@ -53,12 +53,13 @@ async def execute(sql, args=None):
     """Execute SQL to MySql
 
     Args:
-        sql: (str) The sql string, use '?' to link an argument
-        args: (list/tuple -> ()) The unsafe argument corresponded each '?'
+        sql (str): The sql string, use '?' to link an argument
+        args (tuple): The unsafe argument corresponded each '?' (default ())
 
     Returns:
-        - int: The primary id of the insert's primary key
-        - int: The number of the lines affected
+        tuple: (int, int):
+            The primary id of the insert's primary key and
+            The number of the lines affected
     """
     args = args or ()
     async with __pool.acquire() as conn:
@@ -77,12 +78,12 @@ async def select(sql, args=None, size=None):
     """Select the data from MySql
 
     Args:
-        sql: (str) The sql string, use '?' to link an argument
-        args: (list/tuple -> ()) The unsafe argument corresponded each '?'
-        size: (int -> None) The maximum fetch size
+        sql (str): The sql string, use '?' to link an argument
+        args (tuple): The unsafe argument corresponded each '?' (default ())
+        size (int): The maximum fetch size
 
-    Returus:
-        list of models: The rows selected
+    Returns:
+        list: The rows selected (The list of models)
     """
     args = args or ()
     async with __pool.acquire() as conn:
@@ -105,12 +106,12 @@ class Field(object):
         """Init class Field
 
         Args:
-            name: (str) The column name
-            column_type: (str) The sql value type
-            primary_key: (bool) Whether the column is the primary key
-            default:
+            name (str): The column name
+            column_type (str): The sql value type
+            primary_key (bool): Whether the column is the primary key
+            default (Any):
                 (function) Generate the default value from the function
-                (<column_type>-like) Use the default value
+                (other) Use the default value
         """
         self.name = name
         self.column_type = column_type
@@ -237,15 +238,15 @@ class Model(dict, metaclass=ModelMetaclass):
         """Find the table rows
 
         Args:
-            where: (str)
-                SQL WHERE string, will be appebded after `WHERE`, each '?' correspond an argument
-                for example: 'id=?', 'id=? and name=?', 'admin=0'
-            args: (list -> None) The argument of the where string
-            order_by: (str) SQL ORDER BY string, will be appended after `ORDER BY`
-            limit: (int / tuple(int,int)) SQL LIMIT argument, will be appended after `LIMIT`
+            where (str):
+                SQL WHERE string, will be appebded after `WHERE`, each '?' correspond an argument.
+                For example: 'id=?', 'id=? and name=?', 'admin=0'
+            args (list): The argument of the where string
+            order_by (str): SQL ORDER BY string, will be appended after `ORDER BY`
+            limit (tuple): (int, int) SQL LIMIT argument, will be appended after `LIMIT`
 
         Returns:
-            list of cls: The rows found
+            list: The rows found (The list of cls)
         """
         sql = [cls.__sql__['select']]
         if where is not None:
@@ -275,13 +276,12 @@ class Model(dict, metaclass=ModelMetaclass):
         """Count the number of the rows (not include NULL column)
 
         Args:
-            field: (str) '*' or column name
-            where: (str) SQL WHERE string, will be appebded after `WHERE`, each '?' correspond an argument
-            args: (list/tuple -> None) The argument of the where string
+            field (str): '*' or column name
+            where (str): SQL WHERE string, will be appebded after `WHERE`, each '?' correspond an argument
+            args (tuple): The argument of the where string
 
         Returns:
-            - int: The number of the rows
-              None
+            int: The number of the rows, None if no result found (not equal 0)
         """
         sql = [f'SELECT count({field}) _num_ FROM `{cls.__table__}`']
         if where is not None:
@@ -297,11 +297,10 @@ class Model(dict, metaclass=ModelMetaclass):
         """Fetch one item by primary key
 
         Args:
-            pk: (<type of primary key>) The primary key
+            pk (Any): The primary key
 
         Returns:
-            - cls: The row found
-              None: if the row not found
+            <cls>: The row found, None if the row not found
         """
         result = await select(f'{cls.__sql__["select"]} WHERE `{cls.__primary__}`=?', (pk, ), 1)
         if len(result) == 0:
@@ -313,8 +312,7 @@ class Model(dict, metaclass=ModelMetaclass):
         """Fetch a random row from the table
 
         Returns:
-            - cls: The random row
-              None: No row selected (if no rows in the table)
+            <cls>: The random row. None If the table is empty
         """
         rows = await select(cls.__sql__['random'], [], 1)
         if len(rows) == 0:
