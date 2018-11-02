@@ -95,7 +95,7 @@ async def init_database_content():
             KEY `pid` (`pid`),
             KEY `cid` (`cid`),
             KEY `score` (`score`),
-            KEY `result` (`result`),
+            KEY `status` (`status`),
             KEY `language` (`language`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1000;
     ''')
